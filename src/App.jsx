@@ -10,10 +10,43 @@ function App() {
   let [ch1, setCh1] = useState(0);
   let [ch2, setCh2] = useState(0);
   let [cur, setCur] = useState(0);
+  let [c2Promise, setC2Promise] = useState(null);
+  let [isAnimationProceed, setIsAnimationProceed] = useState(false);
   let refName1 = useRef(null), refCount1 = useRef(null), refSrc1 = useRef(null), refOnClick1 = useRef(null);
   let refName2 = useRef(null), refCount2 = useRef(null), refSrc2 = useRef(null), refOnClick2 = useRef(null);
+  //let c2 = 0;
   useEffect(() => {
-    let ignore = false;
+    if(isAnimationProceed){
+      let num = 0;
+      let myVar = setInterval(numIncreasing, 50);
+      setTimeout(stopAnimation, 1000);
+      function numIncreasing(){
+        num++;
+        c2Promise.then(data =>{refCount2.current.innerHTML = Math.floor(data * num / 20)});
+      }
+      function stopAnimation(){
+        clearInterval(myVar)
+        setTimeout(Update, 500);
+        function Update(){
+          setIsAnimationProceed(false);
+          setCur(cur + 1);
+        }
+      }
+    }
+  })
+  let ignore = false;
+  let first_tag = Math.floor(Math.random() * 100);
+  let second_tag = Math.floor(Math.random() * 100);
+  //let first_tag = 0;
+  //let second_tag = 1;
+
+  //alert(first_tag);
+  let name_tags = fetch("https://api.rule34.gg/getTags?raw=true&limit=1000&type=is_character")
+    .then(data => data.json());
+  
+  let count_promise2 = name_tags.then(data => data["tags"][second_tag]["count"]);
+
+  useEffect(() => {
     let first_tag = Math.floor(Math.random() * 100);
     let second_tag = Math.floor(Math.random() * 100);
     //let first_tag = 0;
@@ -23,7 +56,6 @@ function App() {
     let name_tags = fetch("https://api.rule34.gg/getTags?raw=true&limit=1000&type=is_character")
       .then(data => data.json());
 
-    if(!ignore){  
       let tag_promise1 = name_tags.then(data => data["tags"][first_tag]["tag_name"]);
       let tag_promise2 = name_tags.then(data => data["tags"][second_tag]["tag_name"])
 
@@ -38,7 +70,6 @@ function App() {
         .then(data => {refSrc2.current.src = data["posts"][0]["preview"]["file"]});
     
       let count_promise1 = name_tags.then(data => data["tags"][first_tag]["count"]);
-      let count_promise2 = name_tags.then(data => data["tags"][second_tag]["count"]);
     
       count_promise1.then(data => {refCount1.current.innerHTML = data});
       refCount2.current.innerHTML = "???";
@@ -60,23 +91,23 @@ function App() {
           }
         })
       });
-    }
     return (() => {ignore = true;});
-  });
-  function animateCount(){
-    /*useEffect(() => {
-      refCount2.current.innerHTML = "abba";
-    }, []);*/
-  }
+  }, [cur]);
   function onCorrect(){
-    animateCount();
-    setCur(cur + 1);
+    if(isAnimationProceed){
+      return;
+    }
+    setIsAnimationProceed(true);
+    setC2Promise(count_promise2);
     setCount(count + 1); 
     setMaxCount(Math.max(maxCount, count + 1));
   }
   function onIncorrect(){
-    animateCount();
-    setCur(cur + 1);
+    if(isAnimationProceed){
+      return;
+    }
+    setIsAnimationProceed(true);
+    setC2Promise(count_promise2);
     setCount(0);
   }
   return (
@@ -102,6 +133,7 @@ function Option({refName, refCount, refSrc, refOnClick, character}) {
   return (
   <button ref={refOnClick}>
     <img ref={refSrc}></img>
+    
     <div ref={refName}>
 
     </div>

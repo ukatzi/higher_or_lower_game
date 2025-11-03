@@ -7,8 +7,8 @@ export default defineConfig({
     react({
       babel: {
         plugins: [['babel-plugin-react-compiler']],
-        base: "/higher_or_lower_game",
       },
     }),
   ],
+  base: "/higher_or_lower_game",
 })
