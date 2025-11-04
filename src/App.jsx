@@ -72,7 +72,7 @@ function App() {
       let count_promise1 = name_tags.then(data => data["tags"][first_tag]["count"]);
     
       count_promise1.then(data => {refCount1.current.innerHTML = data});
-      refCount2.current.innerHTML = "???";
+      count_promise1.then(data => {refCount2.current.innerHTML = "???"}); 
       //count_promise2.then(data => {refCount2.current.innerHTML = data});
 
       count_promise1.then(count1 => {
