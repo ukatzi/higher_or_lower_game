@@ -112,6 +112,7 @@ function App() {
       setCount(0);
     }
   }
+  
   return (
     <>
       <div>
@@ -131,10 +132,10 @@ function App() {
   )
 }
 
-function Option({refName, refCount, refSrc, refOnClick, character}) {
+function Option({refName, refCount, refSrc, refOnClick, character, pos}) {
   return (
-  <button ref={refOnClick}>
-    <img ref={refSrc} alt="Sorry, image didn't load" height="350"></img>
+  <button ref={refOnClick} po>
+    <img ref={refSrc} alt="Sorry, image didn't load" height="400" margin="auto"></img>
     
     <div ref={refName}>
 
