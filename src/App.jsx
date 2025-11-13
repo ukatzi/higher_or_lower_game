@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-
-import './App.css'
-import TopPlate from './topPlate/TopPlate'
+//import viteLogo from '/vite.svg'
+import onNoImage from './assets/sub_photo.png';
+import './App.css';
 function App() {
   let [count, setCount] = useState(0);
   let [maxCount, setMaxCount] = useState(0);
@@ -37,9 +35,12 @@ function App() {
   
 
   useEffect(() => {
-    let first_tag = Math.floor(Math.random() * 20);
-    let second_tag = Math.floor(Math.random() * 20);
-
+    let tagListLenght = 100;
+    let first_tag = Math.floor(Math.random() * tagListLenght);
+    let second_tag = Math.floor(Math.random() * tagListLenght);
+    while(second_tag == first_tag){
+      second_tag = Math.floor(Math.random() * tagListLenght)
+    }
     let name_tags = fetch("https://api.rule34.gg/getTags?raw=true&limit=1000&type=is_character")
       .then(data => data.json());
 
@@ -51,10 +52,24 @@ function App() {
 
     tag_promise1.then(data => {return fetch("https://api.rule34.gg/getRandomPosts?amount=1&tags=solo&tags=sfw&tags=" + data)})
       .then(data => data.json())
-      .then(data => {refSrc1.current.src = data["posts"][0]["preview"]["file"]});
+      .then(data => {
+        if(data["posts"].length > 0){
+          refSrc1.current.src = data["posts"][0]["preview"]["file"];
+        }
+        else{
+          refSrc1.current.src = onNoImage;
+        }
+      });
     tag_promise2.then(data => {return fetch("https://api.rule34.gg/getRandomPosts?amount=1&tags=solo&tags=sfw&tags=" + data)})
       .then(data => data.json())
-      .then(data => {refSrc2.current.src = data["posts"][0]["preview"]["file"]});
+      .then(data => {
+        if(data["posts"].length > 0){
+          refSrc2.current.src = data["posts"][0]["preview"]["file"];
+        }
+        else{
+          refSrc2.current.src = onNoImage;
+        }
+      });
 
       let count_promise1 = name_tags.then(data => data["tags"][first_tag]["count"]);
       let count_promise2 = name_tags.then(data => data["tags"][second_tag]["count"]);
@@ -83,21 +98,19 @@ function App() {
       });
   }, [cur]);
   function onCorrect(){
-    if(isAnimationProceed){
-      return;
+    if(!isAnimationProceed){
+      setIsAnimationProceed(true);
+      setC2Data(c2);
+      setCount(count + 1); 
+      setMaxCount(Math.max(maxCount, count + 1));
     }
-    setIsAnimationProceed(true);
-    setC2Data(c2);
-    setCount(count + 1); 
-    setMaxCount(Math.max(maxCount, count + 1));
   }
   function onIncorrect(){
-    if(isAnimationProceed){
-      return;
+    if(!isAnimationProceed){
+      setIsAnimationProceed(true);
+      setC2Data(c2);
+      setCount(0);
     }
-    setIsAnimationProceed(true);
-    setC2Data(c2);
-    setCount(0);
   }
   return (
     <>
@@ -121,7 +134,7 @@ function App() {
 function Option({refName, refCount, refSrc, refOnClick, character}) {
   return (
   <button ref={refOnClick}>
-    <img ref={refSrc}></img>
+    <img ref={refSrc} alt="Sorry, image didn't load" height="350"></img>
     
     <div ref={refName}>
 
